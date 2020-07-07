@@ -33,6 +33,44 @@ class ViewController: UIViewController {
         
         locationManager.requestLocation()
     }
+    
+    private func getWeatherWithURLSession(lat : String,long : String) {
+        
+        guard let weatherURL = URL(string: APIClient.shared.getWeatherDataURL(lat: lat, lon: long)) else {return}
+        
+        let task = URLSession.shared.dataTask(with: weatherURL) { (data, response, error) in
+            
+            if let sessionError = error{
+                
+                print(sessionError.localizedDescription)
+                
+                return
+            }
+            
+            guard let data = data else {
+                print("Error data")
+                return
+    
+            }
+            
+            do {
+                
+                guard let weatherData = try JSONSerialization.jsonObject(with: data, options: []) as? [String:Any] else {
+                    
+                    print("there was an error converting data into JSON.")
+                    
+                    return
+                }
+                
+                print(weatherData)
+            } catch {
+                print("error")
+            }
+        }
+        
+        task.resume()
+        
+    }
 }
 
 extension ViewController : CLLocationManagerDelegate {
@@ -45,11 +83,14 @@ extension ViewController : CLLocationManagerDelegate {
         
         if let locationDegrees = locations.first{
             
-            let latitude = locationDegrees.coordinate.latitude
+            let latitude = String(locationDegrees.coordinate.latitude)
             
-            let longitude = locationDegrees.coordinate.longitude
+            let longitude = String(locationDegrees.coordinate.longitude)
             
             print("Latitude : \(latitude) and Longitude : \(longitude)")
+            
+            getWeatherWithURLSession(lat: latitude, long: longitude)
+        
         }
     }
     
