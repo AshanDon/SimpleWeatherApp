@@ -9,6 +9,7 @@
 import UIKit
 import Alamofire
 import CoreLocation
+import SwiftyJSON
 
 class ViewController: UIViewController {
 
@@ -43,10 +44,90 @@ class ViewController: UIViewController {
             return
         }
         
+        let parameter : Parameters = [:]
+        
+        AF.request(url, method: HTTPMethod.get, parameters: parameter, encoding: URLEncoding.default, headers: ["Accept" : "application/json"], interceptor: .none).responseJSON { [ weak self] (response) in
+            
+            guard let strongSelf = self else {return }
+            
+            if let jsonData = response.value as? [String : Any]{
+                
+                DispatchQueue.main.async {
+                    
+                    //strongSelf.parseJSONManually(data: jsonData)
+                    strongSelf.parseJSONWithSwiftyJSON(data: jsonData)
+                    
+                }
+            }
+            
+        }
+        /*
         AF.request(url).responseJSON { (response) in
             if let jsonData = response.value as? [String:Any]{
                 print(jsonData)
             }
+        }
+        */
+    }
+    
+    private func parseJSONManually(data : [String : Any]) {
+        
+        if let cityName = data["name"] as? String {
+            
+            cityNameLabel.text = "\(cityName)"
+            
+        }
+        
+        if let main = data["main"] as? [String : Any] {
+            
+            if let temp = main["temp"] as? Double {
+                
+                temprutureLabel.text = "\(Int(temp))"
+                
+            }
+            
+            if let humidity = main["humidity"] as? Int{
+                
+                humidityLabel.text = "\(humidity)"
+            }
+        }
+        
+        if let wind = data["wind"] as? [String : Any] {
+            
+            if let windSpeed = wind["speed"] as? Double {
+                
+                windSpeedLabel.text = "\(windSpeed)"
+                
+            }
+        }
+    }
+    
+    private func parseJSONWithSwiftyJSON(data : [String : Any]){
+        
+        let jsonData = JSON(data)
+        
+        if let cityName = jsonData["name"].string {
+            
+            cityNameLabel.text = "\(cityName)"
+            
+        }
+        
+        if let temp = jsonData["main"]["temp"].double {
+            
+            temprutureLabel.text = "\(Int(temp))"
+            
+        }
+        
+        if let huminity = jsonData["main"]["humidity"].double {
+            
+            humidityLabel.text = "\(huminity)"
+            
+        }
+        
+        if let windSpeed = jsonData["wind"]["speed"].double {
+            
+            windSpeedLabel.text = "\(windSpeed)"
+            
         }
     }
     
