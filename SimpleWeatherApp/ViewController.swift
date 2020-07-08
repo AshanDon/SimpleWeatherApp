@@ -34,6 +34,22 @@ class ViewController: UIViewController {
         locationManager.requestLocation()
     }
     
+    private func getweatherWithAlamofire(lat : String,long : String) {
+        
+        guard let url = URL(string: APIClient.shared.getWeatherDataURL(lat: lat, lon: long)) else {
+            
+            print("cloud not from url")
+            
+            return
+        }
+        
+        AF.request(url).responseJSON { (response) in
+            if let jsonData = response.value as? [String:Any]{
+                print(jsonData)
+            }
+        }
+    }
+    
     private func getWeatherWithURLSession(lat : String,long : String) {
         
         guard let weatherURL = URL(string: APIClient.shared.getWeatherDataURL(lat: lat, lon: long)) else {return}
@@ -89,7 +105,9 @@ extension ViewController : CLLocationManagerDelegate {
             
             print("Latitude : \(latitude) and Longitude : \(longitude)")
             
-            getWeatherWithURLSession(lat: latitude, long: longitude)
+            //getWeatherWithURLSession(lat: latitude, long: longitude)
+            
+            getweatherWithAlamofire(lat: latitude, long: longitude)
         
         }
     }
