@@ -37,11 +37,13 @@ class ViewController: UIViewController {
     
     private func getweatherWithAlamofire(lat : String,long : String) {
         
-        guard let url = URL(string: APIClient.shared.getWeatherDataURL(lat: lat, lon: long)) else {
+        guard let url = URL(string: APIClient.shared.getWeatherDataURL(lat: lat, lon: long)) else
+        {
             
             print("cloud not from url")
             
             return
+            
         }
         
         let parameter : Parameters = [:]
@@ -55,12 +57,14 @@ class ViewController: UIViewController {
                 DispatchQueue.main.async {
                     
                     //strongSelf.parseJSONManually(data: jsonData)
+                    
                     strongSelf.parseJSONWithSwiftyJSON(data: jsonData)
                     
                 }
             }
             
         }
+        
         /*
         AF.request(url).responseJSON { (response) in
             if let jsonData = response.value as? [String:Any]{
