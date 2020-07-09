@@ -52,6 +52,13 @@ class ViewController: UIViewController {
             
             guard let strongSelf = self else {return }
             
+            guard let data = response.data else {return }
+            
+            DispatchQueue.main.async {
+                strongSelf.parseJSONWithCodable(data: data)
+            }
+            
+            /*
             if let jsonData = response.value as? [String : Any]{
                 
                 DispatchQueue.main.async {
@@ -62,6 +69,7 @@ class ViewController: UIViewController {
                     
                 }
             }
+            */
             
         }
         
@@ -104,6 +112,26 @@ class ViewController: UIViewController {
                 
             }
         }
+    }
+    
+    private func parseJSONWithCodable(data : Data){
+        
+        do {
+            
+            let weatherObject = try JSONDecoder().decode(WeatherModel.self, from: data)
+            
+            cityNameLabel.text = weatherObject.name
+            
+            temprutureLabel.text = "\(Int(weatherObject.temp))"
+            
+            humidityLabel.text = "\(weatherObject.humidity)"
+            
+            windSpeedLabel.text = "\(weatherObject.windSpeed)"
+            
+        } catch let error as NSError {
+            print(error.localizedDescription)
+        }
+        
     }
     
     private func parseJSONWithSwiftyJSON(data : [String : Any]){
